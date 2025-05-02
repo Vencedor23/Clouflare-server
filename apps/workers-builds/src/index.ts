@@ -15,7 +15,7 @@ import { registerAccountTools } from '@repo/mcp-common/src/tools/account'
 import { registerWorkersTools } from '@repo/mcp-common/src/tools/worker'
 
 import { MetricsTracker } from '../../../packages/mcp-observability/src'
-import { registerBuildsTools } from './tools/observability'
+import { registerBuildsTools } from './tools/builds'
 
 import type { AuthProps } from '@repo/mcp-common/src/cloudflare-oauth-handler'
 import type { Env } from './context'
@@ -99,12 +99,12 @@ export class BuildsMCP extends McpAgent<Env, State, Props> {
 	}
 }
 
-const ObservabilityScopes = {
+const BuildsScopes = {
 	...RequiredScopes,
 	'account:read': 'See your account info such as account details, analytics, and memberships.',
 	'workers:write':
 		'See and change Cloudflare Workers data such as zones, KV storage, namespaces, scripts, and routes.',
-	'workers_observability:read': 'See observability logs for your account',
+	// TODO: add builds
 } as const
 
 export default {
@@ -119,7 +119,7 @@ export default {
 				'/sse': BuildsMCP.serveSSE('/sse'),
 			},
 			// @ts-ignore
-			defaultHandler: createAuthHandlers({ scopes: ObservabilityScopes, metrics }),
+			defaultHandler: createAuthHandlers({ scopes: BuildsScopes, metrics }),
 			authorizeEndpoint: '/oauth/authorize',
 			tokenEndpoint: '/token',
 			tokenExchangeCallback: (options) =>
