@@ -1,6 +1,10 @@
 import { z } from 'zod'
 
-import { handleWorkerScriptDownload, handleWorkersList } from '../api/workers'
+import {
+	handleGetWorkersService,
+	handleWorkerScriptDownload,
+	handleWorkersList,
+} from '../api/workers'
 import { getCloudflareClient } from '../cloudflare-api'
 
 import type { CloudflareMcpAgent } from '../types/cloudflare-mcp-agent'
@@ -28,6 +32,7 @@ export function registerWorkersTools(agent: CloudflareMcpAgent) {
 				],
 			}
 		}
+
 		try {
 			const results = await handleWorkersList({
 				client: getCloudflareClient(agent.props.accessToken),
@@ -38,7 +43,7 @@ export function registerWorkersTools(agent: CloudflareMcpAgent) {
 				.map((worker) => ({
 					name: worker.id,
 					// The API client doesn't know tag exists. The tag is needed in other places such as Workers Builds
-					script_id: z.object({ tag: z.string() }).parse(worker),
+					id: z.object({ tag: z.string() }).parse(worker),
 					modified_on: worker.modified_on || null,
 					created_on: worker.created_on || null,
 				}))
@@ -73,6 +78,60 @@ export function registerWorkersTools(agent: CloudflareMcpAgent) {
 		}
 	})
 
+	// Tool to get a specific worker's script details
+	agent.server.tool(
+		'worker_get_worker_details',
+		'Get the name and id of the Cloudflare Worker',
+		{ scriptName: workerNameParam },
+		async (params) => {
+			const accountId = await agent.getActiveAccountId()
+			console.log(params)
+			if (!accountId) {
+				return {
+					content: [
+						{
+							type: 'text',
+							text: 'No currently active accountId. Try listing your accounts (accounts_list) and then setting an active account (set_active_account)',
+						},
+					],
+				}
+			}
+
+			try {
+				const { scriptName } = params
+				const worker = await handleGetWorkersService({
+					apiToken: agent.props.accessToken,
+					scriptName,
+					accountId,
+				})
+				const text = worker.result
+					? JSON.stringify({
+							name: worker.result.id,
+							id: worker.result?.default_environment.script_tag,
+						})
+					: 'Worker not found'
+				return {
+					content: [
+						{
+							type: 'text',
+							text,
+						},
+					],
+				}
+			} catch (e) {
+				agent.server.recordError(e)
+				return {
+					content: [
+						{
+							type: 'text',
+							text: `Error retrieving worker script: ${e instanceof Error && e.message}`,
+						},
+					],
+				}
+			}
+		}
+	)
+
 	// Tool to get a specific worker's script content
 	agent.server.tool(
 		'worker_get_worker',
@@ -90,6 +149,7 @@ export function registerWorkersTools(agent: CloudflareMcpAgent) {
 					],
 				}
 			}
+
 			try {
 				const { scriptName } = params
 				const scriptContent = await handleWorkerScriptDownload({
