@@ -40,14 +40,7 @@ export async function getBuildErrorReason({
 	buildUUID: string
 }) {
 	return `
-You are a debugging machine!
-
-You will be provided information about a Cloudflare Workers Build and you will need to debug it.
-
-For now, you can only validate that the user has remembered to provide a wrangler configuration file.
-If the build failed for an unrelated reason, just say "build failed for an unknown reason. check logs for more info".
-
-If the user forgot the wrangler file, suggest a new 'wrangler.jsonc' based on the following template.
+The user forgot the wrangler file, suggest a new 'wrangler.jsonc' based on the following template.
 Use the build details and local files (if available) to determine the correct entrypoint.
 
 If you have access to create the file, go ahead and create it instead of just suggesting it.
