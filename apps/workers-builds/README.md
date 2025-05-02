@@ -1,4 +1,4 @@
-# Workers Observability MCP Server 🔭
+# Workers Builds MCP Server 🔭
 
 This is a [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that supports remote MCP
 connections, with Cloudflare OAuth built-in.
