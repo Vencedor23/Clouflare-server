@@ -1,5 +1,6 @@
-import { queryWorkersObservability } from '@repo/mcp-common/src/api/workers-observability'
-import { zQueryRunRequest } from '@repo/mcp-common/src/types/workers-logs-schemas'
+import { z } from 'zod'
+
+import { getLatestWorkersBuild } from '@repo/mcp-common/src/api/workers-builds.api'
 
 import type { BuildsMCP } from '../index'
 
@@ -12,15 +13,15 @@ import type { BuildsMCP } from '../index'
 export function registerBuildsTools(agent: BuildsMCP) {
 	// Register the worker logs analysis tool by worker name
 	agent.server.tool(
-		'list_workers_builds',
+		'get_latest_workers_build',
 		`
-Query the Workers Builds API to view builds from your Cloudflare Workers.
+Use the Workers Builds API to get the latest build for a Cloudflare Worker.
 `.trim(),
 
 		{
-			query: zQueryRunRequest,
+			scriptId: z.string(),
 		},
-		async ({ query }) => {
+		async ({ scriptId }) => {
 			const accountId = await agent.getActiveAccountId()
 			if (!accountId) {
 				return {
@@ -32,8 +33,13 @@ Query the Workers Builds API to view builds from your Cloudflare Workers.
 					],
 				}
 			}
+
 			try {
-				const res = await queryWorkersObservability(agent.props.accessToken, accountId, query)
+				const res = await getLatestWorkersBuild({
+					apiToken: agent.props.accessToken,
+					accountId,
+					scriptId,
+				})
 				return {
 					content: [
 						{

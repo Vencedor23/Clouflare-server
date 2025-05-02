@@ -135,7 +135,10 @@ export function registerWorkersTools(agent: CloudflareMcpAgent) {
 	// Tool to get a specific worker's script content
 	agent.server.tool(
 		'worker_get_worker',
-		'Get the source code of a Cloudflare Worker',
+		`Get the source code of a Cloudflare Worker
+
+		If you need to get the ID of a Worker, use worker_get_worker_details instead.
+		`.trim(),
 		{ scriptName: workerNameParam },
 		async (params) => {
 			const accountId = await agent.getActiveAccountId()
