@@ -37,6 +37,8 @@ export function registerWorkersTools(agent: CloudflareMcpAgent) {
 			const workers = results
 				.map((worker) => ({
 					name: worker.id,
+					// The API client doesn't know tag exists. The tag is needed in other places such as Workers Builds
+					script_id: z.object({ tag: z.string() }).parse(worker),
 					modified_on: worker.modified_on || null,
 					created_on: worker.created_on || null,
 				}))
