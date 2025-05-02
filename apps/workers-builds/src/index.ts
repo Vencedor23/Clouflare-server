@@ -15,7 +15,7 @@ import { registerAccountTools } from '@repo/mcp-common/src/tools/account'
 import { registerWorkersTools } from '@repo/mcp-common/src/tools/worker'
 
 import { MetricsTracker } from '../../../packages/mcp-observability/src'
-import { registerObservabilityTools } from './tools/observability'
+import { registerBuildsTools } from './tools/observability'
 
 import type { AuthProps } from '@repo/mcp-common/src/cloudflare-oauth-handler'
 import type { Env } from './context'
@@ -35,7 +35,7 @@ type Props = AuthProps
 
 type State = { activeAccountId: string | null }
 
-export class ObservabilityMCP extends McpAgent<Env, State, Props> {
+export class BuildsMCP extends McpAgent<Env, State, Props> {
 	_server: CloudflareMCPServer | undefined
 	set server(server: CloudflareMCPServer) {
 		this._server = server
@@ -58,13 +58,12 @@ export class ObservabilityMCP extends McpAgent<Env, State, Props> {
 			},
 			sentry: initSentryWithUser(env, this.ctx, this.props.user.id),
 			options: {
-				instructions: `# Cloudflare Workers Observability Tool
+				instructions: `# Cloudflare Workers Builds Tool
 				* A cloudflare worker is a serverless function
-				* Workers Observability is the tool to inspect the logs for your cloudflare Worker
-				* Each log is a structured JSON payload with keys and values
+				* Workers Builds is a CI/CD system for building and deploying your Worker whenever you push code to GitHub/GitLab.
 
 
-				This server allows you to analyze your Cloudflare Workers logs and metrics.
+				This server allows you to view and debug Cloudflare Workers Builds for your Workers.
 				`,
 			},
 		})
@@ -75,7 +74,7 @@ export class ObservabilityMCP extends McpAgent<Env, State, Props> {
 		registerWorkersTools(this)
 
 		// Register Cloudflare Workers logs tools
-		registerObservabilityTools(this)
+		registerBuildsTools(this)
 	}
 
 	async getActiveAccountId() {
@@ -111,13 +110,13 @@ const ObservabilityScopes = {
 export default {
 	fetch: async (req: Request, env: Env, ctx: ExecutionContext) => {
 		if (env.ENVIRONMENT === 'development' && env.DEV_DISABLE_OAUTH === 'true') {
-			return await handleDevMode(ObservabilityMCP, req, env, ctx)
+			return await handleDevMode(BuildsMCP, req, env, ctx)
 		}
 
 		return new OAuthProvider({
 			apiHandlers: {
-				'/mcp': ObservabilityMCP.serve('/mcp'),
-				'/sse': ObservabilityMCP.serveSSE('/sse'),
+				'/mcp': BuildsMCP.serve('/mcp'),
+				'/sse': BuildsMCP.serveSSE('/sse'),
 			},
 			// @ts-ignore
 			defaultHandler: createAuthHandlers({ scopes: ObservabilityScopes, metrics }),

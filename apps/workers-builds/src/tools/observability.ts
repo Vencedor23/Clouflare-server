@@ -9,7 +9,7 @@ import {
 	zValuesRequest,
 } from '@repo/mcp-common/src/types/workers-logs-schemas'
 
-import type { ObservabilityMCP } from '../index'
+import type { BuildsMCP } from '../index'
 
 /**
  * Registers the logs analysis tool with the MCP server
@@ -17,7 +17,7 @@ import type { ObservabilityMCP } from '../index'
  * @param accountId Cloudflare account ID
  * @param apiToken Cloudflare API token
  */
-export function registerObservabilityTools(agent: ObservabilityMCP) {
+export function registerBuildsTools(agent: BuildsMCP) {
 	// Register the worker logs analysis tool by worker name
 	agent.server.tool(
 		'query_worker_observability',

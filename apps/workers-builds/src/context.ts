@@ -1,5 +1,5 @@
 import type { UserDetails } from '@repo/mcp-common/src/durable-objects/user_details'
-import type { ObservabilityMCP } from './index'
+import type { BuildsMCP } from './index'
 
 export interface Env {
 	OAUTH_KV: KVNamespace
@@ -8,7 +8,7 @@ export interface Env {
 	MCP_SERVER_VERSION: string
 	CLOUDFLARE_CLIENT_ID: string
 	CLOUDFLARE_CLIENT_SECRET: string
-	MCP_OBJECT: DurableObjectNamespace<ObservabilityMCP>
+	MCP_OBJECT: DurableObjectNamespace<BuildsMCP>
 	USER_DETAILS: DurableObjectNamespace<UserDetails>
 	MCP_METRICS: AnalyticsEngineDataset
 	SENTRY_ACCESS_CLIENT_ID: string
