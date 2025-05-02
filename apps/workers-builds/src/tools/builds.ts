@@ -1,13 +1,5 @@
-import {
-	handleWorkerLogsKeys,
-	handleWorkerLogsValues,
-	queryWorkersObservability,
-} from '@repo/mcp-common/src/api/workers-observability'
-import {
-	zKeysRequest,
-	zQueryRunRequest,
-	zValuesRequest,
-} from '@repo/mcp-common/src/types/workers-logs-schemas'
+import { queryWorkersObservability } from '@repo/mcp-common/src/api/workers-observability'
+import { zQueryRunRequest } from '@repo/mcp-common/src/types/workers-logs-schemas'
 
 import type { BuildsMCP } from '../index'
 
