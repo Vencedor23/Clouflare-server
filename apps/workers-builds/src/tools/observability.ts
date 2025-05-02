@@ -20,11 +20,10 @@ import type { BuildsMCP } from '../index'
 export function registerBuildsTools(agent: BuildsMCP) {
 	// Register the worker logs analysis tool by worker name
 	agent.server.tool(
-		'query_worker_observability',
-		`Query the Workers Observability API to analyze logs and metrics from your Cloudflare Workers.
+		'list_workers_builds',
+		`
+Query the Workers Builds API to view builds from your Cloudflare Workers.
 
-	* A query typical query looks like this:
-				{"view":"events","queryId":"workers-logs-events","limit":5,"dry":true,"parameters":{"datasets":["cloudflare-workers"],"filters":[{"id":"520","key":"message","operation":"eq","type":"string","value":"Clickhouse Statistics"},{"id":"2088","key":"statistics.elapsed","operation":"gt","type":"number","value":"0.269481519"}],"calculations":[],"groupBys":[],"havings":[]},"timeframe":{"to":"2025-04-30T20:53:15Z","from":" ""2025-04-30T19:53:15Z"}}
 ## Core Capabilities
 This tool provides three primary views of your Worker data:
 1. **List Events** - Browse individual request logs and errors
@@ -41,7 +40,7 @@ This tool provides three primary views of your Worker data:
 ## Troubleshooting
 - If no results are returned, suggest broadening the time range or relaxing filters
 - For errors about invalid fields, recommend using observability_keys to see available options
-`,
+`.trim(),
 
 		{
 			query: zQueryRunRequest,
